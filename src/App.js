@@ -3,6 +3,7 @@ import Blog from './components/Blog'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import LogoutButton from './components/LogoutButton'
+import NewBlogForm from './components/NewBlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -16,7 +17,7 @@ const App = () => {
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationStyle, setNotificationStyle] = useState('notification')
 
-  const newNotification = (message, style = 'notification', timeout = 6000) => {
+  const createNotification = (message, style = 'notification', timeout = 6000) => {
     //clear possible old timeout so it doesn't set this new notification to null prematurely
     if (notificationTimeoutId != null) {
       clearTimeout(notificationTimeoutId)
@@ -30,13 +31,12 @@ const App = () => {
     }, timeout)
   }
 
-  useEffect(() => {
-    //useEffect() can't be async so create a separate async func and call it
-    const updateBlogList = async () => {
-      const blogList = await blogService.getAll()
-      setBlogs(blogList)
-    }
+  const updateBlogList = async () => {
+    const blogList = await blogService.getAll()
+    setBlogs(blogList)
+  }
 
+  useEffect(() => {
     updateBlogList()
   }, [])
 
@@ -52,7 +52,6 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    console.log('logging in with', username, password)
 
     try {
       const user = await loginService.login({
@@ -64,31 +63,28 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      setNotificationMessage(null)
     }
     catch (exception) {
-      newNotification('wrong username or password', 'error')
+      createNotification('wrong username or password', 'error')
     }
   }
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedUser')
+    blogService.setToken(null)
     setUser(null)
-  }
-
-  const handleNewBlog = (event) => {
-    event.preventDefault()
-
-    
   }
 
   if (user !== null) {
     return (
       <div>
         <h2>blogs</h2>
+        <Notification message={notificationMessage} style={notificationStyle} />
         <p>{user.name} logged in <LogoutButton handleLogout={handleLogout} /></p>
 
         <h2>create new</h2>
-        {/*<NewBlogForm /> */}
+        <NewBlogForm createNotification={createNotification} blogService={blogService} updateBlogList={updateBlogList} />
 
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
@@ -100,9 +96,7 @@ const App = () => {
   return (
     <div>
       <h1>Log in to application</h1>
-
       <Notification message={notificationMessage} style={notificationStyle} />
-
       <LoginForm username={username} password={password} setUsername={setUsername} setPassword={setPassword} handleLogin={handleLogin} />
 
     </div>
