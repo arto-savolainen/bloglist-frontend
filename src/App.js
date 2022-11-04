@@ -20,9 +20,28 @@ const App = () => {
     setBlogs(blogList)
   }
 
+  //this is used to update likes
+  //a more general update function would create a notification and thus require a separate implementation
   const updateBlog = async (updateBlog) => {
-    const updatedBlog = await blogService.update(updateBlog)
-    return updatedBlog
+    try {
+      const updatedBlog = await blogService.update(updateBlog)
+      return updatedBlog
+    }
+    catch (exception) {
+      createNotification(`Error: ${exception.response.data.error}`, 'error')
+    }
+  }
+
+  const deleteBlog = async (id) => {
+    try {
+      const deletedBlog = await blogService.remove(id)
+      createNotification('Blog deleted')
+      await updateBlogList()
+      return deletedBlog
+    }
+    catch (exception) {
+      createNotification(`Error: ${exception.response.data.error}`, 'error')
+    }
   }
 
   const createNotification = (message, style, timeout) => {
@@ -99,7 +118,7 @@ const App = () => {
         </Togglable>
 
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
         )}
       </div>
     )
