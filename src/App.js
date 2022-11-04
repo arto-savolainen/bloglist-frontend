@@ -19,6 +19,11 @@ const App = () => {
     setBlogs(blogList)
   }
 
+  const updateBlog = async (updateBlog) => {
+    const updatedBlog = await blogService.update(updateBlog)
+    return updatedBlog
+  }
+
   const createNotification = (message, style, timeout) => {
     notificationRef.current.createNotification(message, style, timeout)
   }
@@ -93,7 +98,7 @@ const App = () => {
         </Togglable>
 
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
         )}
       </div>
     )
