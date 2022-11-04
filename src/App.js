@@ -1,39 +1,26 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import LogoutButton from './components/LogoutButton'
-import NewBlogForm from './components/NewBlogForm'
+import AddBlogForm from './components/AddBlogForm'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
-let notificationTimeoutId = null
-
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [notificationMessage, setNotificationMessage] = useState(null)
-  const [notificationStyle, setNotificationStyle] = useState('notification')
-
-  const createNotification = (message, style = 'notification', timeout = 6000) => {
-    //clear possible old timeout so it doesn't set this new notification to null prematurely
-    if (notificationTimeoutId != null) {
-      clearTimeout(notificationTimeoutId)
-    }
-
-    setNotificationMessage(message)
-    setNotificationStyle(style)
-
-    notificationTimeoutId = setTimeout(() => {
-      setNotificationMessage(null)
-    }, timeout)
-  }
+  const notificationRef = useRef()
+  const toggleAddBlogFormRef = useRef()
 
   const updateBlogList = async () => {
     const blogList = await blogService.getAll()
     setBlogs(blogList)
+  }
+
+  const createNotification = (message, style, timeout) => {
+    notificationRef.current.createNotification(message, style, timeout)
   }
 
   useEffect(() => {
@@ -50,7 +37,7 @@ const App = () => {
     }
   }, [])
 
-  const handleLogin = async (event) => {
+  const handleLogin = async (event, username, password) => {
     event.preventDefault()
 
     try {
@@ -61,12 +48,10 @@ const App = () => {
       blogService.setToken(user.token)
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
       setUser(user)
-      setUsername('')
-      setPassword('')
-      setNotificationMessage(null)
+      createNotification(null)
     }
     catch (exception) {
-      createNotification('wrong username or password', 'error')
+      createNotification('Wrong username or password', 'error')
     }
   }
 
@@ -74,17 +59,38 @@ const App = () => {
     window.localStorage.removeItem('loggedUser')
     blogService.setToken(null)
     setUser(null)
+    createNotification('You have logged out')
+  }
+
+  const handleAddBlog = async (event, newBlog) => {
+    event.preventDefault()
+
+    try {
+      const createdBlog = await blogService.create(newBlog)
+      toggleAddBlogFormRef.current.toggleVisibility()
+      createNotification(`A new blog ${createdBlog.title} by ${createdBlog.author} added`)
+      await updateBlogList()
+    }
+    catch (exception) {
+      //console.log('exception:', exception)
+      //note: if jwt token expiration is set, expired token exception is caught here
+      //would need a more comprehensive session management system to handle that properly
+      //for now, user is required to logout and log back in if token is expired
+      createNotification(`Error: ${exception.response.data.error}`, 'error')
+    }
   }
 
   if (user !== null) {
     return (
       <div>
         <h2>blogs</h2>
-        <Notification message={notificationMessage} style={notificationStyle} />
+        <Notification ref={notificationRef}/>
         <p>{user.name} logged in <LogoutButton handleLogout={handleLogout} /></p>
 
-        <h2>create new</h2>
-        <NewBlogForm createNotification={createNotification} blogService={blogService} updateBlogList={updateBlogList} />
+        <Togglable buttonLabel='add blog' ref={toggleAddBlogFormRef}>
+          <h2>create new</h2>
+          <AddBlogForm handleAddBlog={handleAddBlog} />
+        </Togglable>
 
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
@@ -96,8 +102,8 @@ const App = () => {
   return (
     <div>
       <h1>Log in to application</h1>
-      <Notification message={notificationMessage} style={notificationStyle} />
-      <LoginForm username={username} password={password} setUsername={setUsername} setPassword={setPassword} handleLogin={handleLogin} />
+      <Notification ref={notificationRef}/>
+      <LoginForm handleLogin={handleLogin} />
 
     </div>
   )

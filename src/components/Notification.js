@@ -1,13 +1,53 @@
-const Notification = ({ message, style }) => {
-  if (message === null) {
-    return null
+import { useState, useImperativeHandle, forwardRef } from 'react'
+
+let notificationTimeoutId = null
+
+//moved notification state from App to component but this seems much hackier. whatever
+const Notification = forwardRef((props, ref) => {
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [notificationStyle, setNotificationStyle] = useState(null)
+
+  const createNotification = (message, style = 'notification', timeout = 6000) => {
+    //console.log('createNotification: message:', message, 'style:', style, 'timeout:', timeout, 'props:', props)
+    const clearNotification = () => {
+      if (notificationTimeoutId != null) {
+        clearTimeout(notificationTimeoutId)
+      }
+
+      setNotificationMessage(null)
+      setNotificationStyle(null)
+    }
+
+    //calling with message === null clears notification
+    if (message === null) {
+      clearNotification()
+      return
+    }
+
+    //clear possible previous timeout so it doesn't set this new notification to null prematurely
+    if (notificationTimeoutId != null) {
+      clearTimeout(notificationTimeoutId)
+    }
+
+    setNotificationMessage(message)
+    setNotificationStyle(style)
+
+    notificationTimeoutId = setTimeout(() => {
+      clearNotification()
+    }, timeout)
   }
 
-  let notificationStyle
+  useImperativeHandle(ref, () => {
+    return {
+      createNotification
+    }
+  })
 
-  switch (style) {
+  let notificationCssStyle
+
+  switch (notificationStyle) {
     case 'notification':
-      notificationStyle = {
+      notificationCssStyle = {
         color: "green",
         fontStyle: "bold",
         fontSize: 20,
@@ -20,7 +60,7 @@ const Notification = ({ message, style }) => {
       }
       break
     case 'error':
-      notificationStyle = {
+      notificationCssStyle = {
         color: "red",
         fontStyle: "bold",
         fontSize: 20,
@@ -32,15 +72,19 @@ const Notification = ({ message, style }) => {
         margin: 5
       }
       break
+    case null:
+      notificationCssStyle = null
+      break
     default:
+      notificationCssStyle = null
       break
   }
 
   return (
-    <div className="notification" style={notificationStyle}>
-      {message}
+    <div className="notification" style={notificationCssStyle}>
+      {notificationMessage}
     </div>
   )
-}
+})
 
 export default Notification
