@@ -2,7 +2,8 @@ import { useState, useImperativeHandle, forwardRef } from 'react'
 
 let notificationTimeoutId = null
 
-//moved notification state from App to component but this seems much hackier. whatever
+//moved notification state from App to component but this seems hackier. 
+//maybe state should be held by App. it works so whatever
 const Notification = forwardRef((props, ref) => {
   const [notificationMessage, setNotificationMessage] = useState(null)
   const [notificationStyle, setNotificationStyle] = useState(null)
@@ -43,11 +44,11 @@ const Notification = forwardRef((props, ref) => {
     }
   })
 
-  let notificationCssStyle
+  let notificationCss
 
   switch (notificationStyle) {
     case 'notification':
-      notificationCssStyle = {
+      notificationCss = {
         color: "green",
         fontStyle: "bold",
         fontSize: 20,
@@ -60,7 +61,7 @@ const Notification = forwardRef((props, ref) => {
       }
       break
     case 'error':
-      notificationCssStyle = {
+      notificationCss = {
         color: "red",
         fontStyle: "bold",
         fontSize: 20,
@@ -73,15 +74,15 @@ const Notification = forwardRef((props, ref) => {
       }
       break
     case null:
-      notificationCssStyle = null
+      notificationCss = null
       break
     default:
-      notificationCssStyle = null
+      notificationCss = null
       break
   }
 
   return (
-    <div className="notification" style={notificationCssStyle}>
+    <div className="notification" style={notificationCss}>
       {notificationMessage}
     </div>
   )

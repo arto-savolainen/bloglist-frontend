@@ -84,7 +84,7 @@ const App = () => {
     return (
       <div>
         <h2>blogs</h2>
-        <Notification ref={notificationRef}/>
+        <Notification ref={notificationRef} />
         <p>{user.name} logged in <LogoutButton handleLogout={handleLogout} /></p>
 
         <Togglable buttonLabel='add blog' ref={toggleAddBlogFormRef}>
@@ -102,7 +102,7 @@ const App = () => {
   return (
     <div>
       <h1>Log in to application</h1>
-      <Notification ref={notificationRef}/>
+      <Notification ref={notificationRef} />
       <LoginForm handleLogin={handleLogin} />
 
     </div>
