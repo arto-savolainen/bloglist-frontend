@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 //this works so keeping it for now
 const Blog = ({ blog, updateBlog, deleteBlog }) => {
   const [visible, setVisible] = useState(false)
+  // eslint-disable-next-line no-unused-vars
   const [likes, setLikes] = useState(null)
 
   const showWhenVisible = { display: visible ? '' : 'none' }

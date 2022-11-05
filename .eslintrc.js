@@ -16,12 +16,13 @@ module.exports = {
             'jsx': true,
             'modules': true
         },
-        "sourceType": "module",
+        'sourceType': 'module',
         'ecmaVersion': 'latest'
     },
     'rules': {
         // suppress errors for missing 'import React' in files
         'react/react-in-jsx-scope': 'off',
+        'react/display-name': 'off',
         'indent': [
             'error',
             2,
