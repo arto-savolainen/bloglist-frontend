@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 
 //not sure how to divide responsibilities between App and other components
 //maybe handleLikeClick and handleDeleteClick should be moved to App to keep this as more of a view component?
@@ -70,4 +71,11 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
     </div>
   )
 }
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  updateBlog: PropTypes.func.isRequired,
+  deleteBlog: PropTypes.func.isRequired
+}
+
 export default Blog
