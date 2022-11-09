@@ -12,8 +12,8 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
   const showWhenVisible = { display: visible ? '' : 'none' }
   const buttonLabel = visible ? 'hide' : 'view'
 
-  //css could, more properly, be imported from a file. not going to bother here
-  const blogListStyle = {
+  //css could, more properly, be imported from a file. not going to bother here for now
+  const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
     paddingBottom: 1,
@@ -58,7 +58,7 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
   }
 
   return (
-    <div style={blogListStyle}>
+    <div className='blog' style={blogStyle}>
       <div style={blogNameStyle} onClick={toggleVisibility}>{blog.title}</div> by {blog.author} <button onClick={toggleVisibility}>{buttonLabel}</button>
       <div style={showWhenVisible}>
         {blog.url}

@@ -17,7 +17,7 @@ module.exports = {
             'modules': true
         },
         'sourceType': 'module',
-        'ecmaVersion': 'latest'
+        'ecmaVersion': 12,
     },
     'rules': {
         // suppress errors for missing 'import React' in files
