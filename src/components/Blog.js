@@ -26,6 +26,9 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
     display: 'inline',
     cursor: 'pointer'
   }
+  const blogAuthorStyle = {
+    display: 'inline'
+  }
   const deleteBlogButtonStyle = {
     display: 'inline-block',
     padding: '0.35em 1.2em',
@@ -59,7 +62,7 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
 
   return (
     <div className='blog' style={blogStyle}>
-      <div style={blogNameStyle} onClick={toggleVisibility}>{blog.title}</div> by {blog.author} <button onClick={toggleVisibility}>{buttonLabel}</button>
+      <div style={blogNameStyle} onClick={toggleVisibility}>{blog.title}</div> by <div style={blogAuthorStyle}>{blog.author}</div> <button onClick={toggleVisibility}>{buttonLabel}</button>
       <div style={showWhenVisible}>
         {blog.url}
         <br />
