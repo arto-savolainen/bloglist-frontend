@@ -50,7 +50,7 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
 
   const handleLikeClick = async () => {
     blog.likes += 1
-    await updateBlog(blog)
+    blog = await updateBlog(blog)
     setLikes(blog.likes)
   }
 
@@ -63,13 +63,10 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
   return (
     <div className='blog' style={blogStyle}>
       <div style={blogNameStyle} onClick={toggleVisibility}>{blog.title}</div> by <div style={blogAuthorStyle}>{blog.author}</div> <button onClick={toggleVisibility}>{buttonLabel}</button>
-      <div style={showWhenVisible}>
-        {blog.url}
-        <br />
-        {blog.likes} <button onClick={handleLikeClick}>like</button>
-        <br />
-        {blog.user ? blog.user.name : 'Unknown user'}
-        <br />
+      <div style={showWhenVisible} className='togglableContent'>
+        <div>{blog.url}</div>
+        <div>{blog.likes} <button onClick={handleLikeClick}>like</button></div>
+        <div>{blog.user ? blog.user.name : 'Unknown user'}</div>
         <button style={deleteBlogButtonStyle} onClick={handleDeleteClick}>delete blog</button>
       </div>
     </div>
