@@ -4,44 +4,71 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
-const blog = {
-  id: '6351a675791242ac66083f7c',
-  url: 'www.testurl.bla',
-  title: 'Test blog',
-  author: 'Test author',
-  likes: 69420,
-  user: 'Testaaja'
-}
+describe('Blog tests', () => {
+  const blog = {
+    id: '6351a675791242ac66083f7c',
+    url: 'www.testurl.bla',
+    title: 'Test blog',
+    author: 'Test author',
+    likes: 69420,
+    user: 'Testaaja'
+  }
 
-let container
+  let container
 
-const foo = () => {
-  //dummy function for required proptypes
-}
+  //do mock functions only work when defined within test() scope?
+  //these don't work if declared here
+  //how am i supposed to use beforeEach() if rendering with mock functions must be done within test()?
+  // const mockUpdateHandler = jest.fn(x => x)
+  // const mockDeleteHandler = jest.fn(x => x)
 
-beforeEach(() => {
-  container = render(<Blog key={blog.id} blog={blog} updateBlog={foo} deleteBlog={foo} />).container
-})
+  const foo = () => {
+    //dummy function for required proptypes
+  }
 
-test('Blog renders only title and author', async () => {
-  const div = container.querySelector('.togglableContent')
-  expect(div).toHaveStyle('display: none')
+  // beforeEach(() => {
+  //   container = render(<Blog key={blog.id} blog={blog} updateBlog={mockUpdateHandler} deleteBlog={mockDeleteHandler} />).container
+  // })
 
-  let element = await screen.findByText('Test blog')
-  element = await screen.findByText('Test author')
-})
+  test('Blog renders only title and author', async () => {
+    container = render(<Blog key={blog.id} blog={blog} updateBlog={foo} deleteBlog={foo} />).container
 
-test('clicking the view button renders url and likes', async () => {
-  const user = userEvent.setup()
-  const button = screen.getByText('view')
-  await user.click(button)
+    const div = container.querySelector('.togglableContent')
+    expect(div).toHaveStyle('display: none')
 
-  const div = container.querySelector('.togglableContent')
-  expect(div).not.toHaveStyle('display: none')
+    let element = await screen.findByText('Test blog')
+    element = await screen.findByText('Test author')
+  })
 
-  let element = await screen.findByText('Test blog')
-  element = await screen.findByText('Test author')
-  element = await screen.findByText('www.testurl.bla')
-  element = await screen.findByText('69420')
+  test('clicking the view button renders url and likes', async () => {
+    container = render(<Blog key={blog.id} blog={blog} updateBlog={foo} deleteBlog={foo} />).container
 
+    const user = userEvent.setup()
+    const button = screen.getByText('view')
+    await user.click(button)
+
+    const div = container.querySelector('.togglableContent')
+    expect(div).not.toHaveStyle('display: none')
+
+    let element = await screen.findByText('Test blog')
+    element = await screen.findByText('Test author')
+    element = await screen.findByText('www.testurl.bla')
+    element = await screen.findByText('69420')
+  })
+
+  test('clicking the like button twice calls the handler function passed as prop twice, and increases likes by 2', async () => {
+    const likesAtBeginning = blog.likes
+    const user = userEvent.setup()
+    const mockUpdateHandler = jest.fn(x => x)
+    const mockDeleteHandler = jest.fn(x => x)
+
+    container = render(<Blog key={blog.id} blog={blog} updateBlog={mockUpdateHandler} deleteBlog={mockDeleteHandler} />).container
+
+    const button = screen.getByText('like')
+    await user.click(button)
+    await user.click(button)
+
+    expect(mockUpdateHandler.mock.calls).toHaveLength(2)
+    expect(blog.likes).toBe(likesAtBeginning + 2)
+  })
 })
