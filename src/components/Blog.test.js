@@ -30,14 +30,20 @@ describe('Blog tests', () => {
   //   container = render(<Blog key={blog.id} blog={blog} updateBlog={mockUpdateHandler} deleteBlog={mockDeleteHandler} />).container
   // })
 
-  test('Blog renders only title and author', async () => {
+  test('Blog renders only title and author by default', async () => {
     container = render(<Blog key={blog.id} blog={blog} updateBlog={foo} deleteBlog={foo} />).container
 
     const div = container.querySelector('.togglableContent')
     expect(div).toHaveStyle('display: none')
 
     let element = await screen.findByText('Test blog')
+    expect(element).toBeVisible()
     element = await screen.findByText('Test author')
+    expect(element).toBeVisible()
+    element = await screen.findByText('www.testurl.bla')
+    expect(element).not.toBeVisible()
+    element = await screen.findByText('69420')
+    expect(element).not.toBeVisible()
   })
 
   test('clicking the view button renders url and likes', async () => {
@@ -51,18 +57,21 @@ describe('Blog tests', () => {
     expect(div).not.toHaveStyle('display: none')
 
     let element = await screen.findByText('Test blog')
+    expect(element).toBeVisible()
     element = await screen.findByText('Test author')
+    expect(element).toBeVisible()
     element = await screen.findByText('www.testurl.bla')
+    expect(element).toBeVisible()
     element = await screen.findByText('69420')
+    expect(element).toBeVisible()
   })
 
   test('clicking the like button twice calls the handler function passed as prop twice, and increases likes by 2', async () => {
     const likesAtBeginning = blog.likes
     const user = userEvent.setup()
     const mockUpdateHandler = jest.fn(x => x)
-    const mockDeleteHandler = jest.fn(x => x)
 
-    container = render(<Blog key={blog.id} blog={blog} updateBlog={mockUpdateHandler} deleteBlog={mockDeleteHandler} />).container
+    render(<Blog key={blog.id} blog={blog} updateBlog={mockUpdateHandler} deleteBlog={mockUpdateHandler} />)
 
     const button = screen.getByText('like')
     await user.click(button)
