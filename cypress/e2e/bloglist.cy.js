@@ -41,6 +41,17 @@ describe('Blog app', function () {
       url: 'test url'
     }
 
+    function addBlog() {
+      cy.contains('add blog').click()
+
+      cy.get('#title').type(blog.title)
+      cy.get('#author').type(blog.author)
+      cy.get('#url').type(blog.url)
+      cy.get('#create-blog-button').click()
+
+      cy.contains('view').click()
+    }
+
     beforeEach(function () {
       cy.get('#username').type(user.username)
       cy.get('#password').type(user.password)
@@ -48,35 +59,59 @@ describe('Blog app', function () {
     })
 
     it('A blog can be created', function () {
-      cy.contains('add blog').click()
-
-      cy.get('#title').type(blog.title)
-      cy.get('#author').type(blog.author)
-      cy.get('#url').type(blog.url)
-      cy.get('#create-blog-button').click()
+      addBlog()
 
       cy.contains(`A new blog ${blog.title} by ${blog.author} added`)
       cy.get('.notification').should('have.css', 'color', 'rgb(0, 128, 0)')
 
       cy.contains(`${blog.title} by ${blog.author}`)
-      cy.contains('view').click()
       cy.get('#blog-url').contains(blog.url)
       cy.get('#blog-likes').contains('0')
       cy.get('#blog-user').contains(user.name)
     })
 
     it('A blog can be liked', function () {
-      cy.contains('add blog').click()
+      addBlog()
 
-      cy.get('#title').type(blog.title)
-      cy.get('#author').type(blog.author)
-      cy.get('#url').type(blog.url)
-      cy.get('#create-blog-button').click()
-
-      cy.contains('view').click()
       cy.get('#blog-likes').contains('0')
       cy.get('#like-button').click()
       cy.get('#blog-likes').contains('1')
+    })
+
+    it('A blog can be deleted', function () {
+      addBlog()
+
+      cy.get('#delete-blog-button').click()
+      cy.on('window:confirm', function () {
+        return true
+      })
+      cy.contains('Blog deleted')
+      cy.contains(`${blog.title} by ${blog.author}`).should('not.exist')
+    })
+
+    it('A blog cannot be deleted by another user', function () {
+      addBlog()
+
+      cy.contains('logout').click()
+
+      const user2 = {
+        username: 'forbiddenuser',
+        name: 'Forbidden User',
+        password: 'password'
+      }
+      cy.request('POST', 'http://localhost:3003/api/users/', user2)
+
+      cy.get('#username').type(user2.username)
+      cy.get('#password').type(user2.password)
+      cy.get('#login-button').click()
+
+      cy.contains('view').click()
+      cy.get('#delete-blog-button').click()
+      cy.on('window:confirm', function () {
+        return true
+      })
+      cy.contains('Error: not authorized')
+      cy.contains(`${blog.title} by ${blog.author}`)
     })
   })
 })
