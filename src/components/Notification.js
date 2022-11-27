@@ -82,7 +82,7 @@ const Notification = forwardRef((props, ref) => {
   }
 
   return (
-    <div className='notification' style={notificationCss}>
+    <div className={notificationStyle} style={notificationCss}>
       {notificationMessage}
     </div>
   )
