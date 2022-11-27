@@ -3,7 +3,9 @@ module.exports = {
         'node': true,
         'commonjs': true,
         'es6': true,
-        'browser': true
+        'browser': true,
+        'jest/globals': true,
+        'cypress/globals': true
     },
     'extends': [
         'eslint:recommended',
@@ -19,6 +21,9 @@ module.exports = {
         'sourceType': 'module',
         'ecmaVersion': 12,
     },
+    "plugins": [
+        "react", "jest", "cypress"
+    ],
     'rules': {
         // suppress errors for missing 'import React' in files
         'react/react-in-jsx-scope': 'off',

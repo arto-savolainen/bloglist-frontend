@@ -3,3 +3,4 @@ build
 App.test.js
 reportWebVitals.js
 setupTests.js
+cypress.config.js
