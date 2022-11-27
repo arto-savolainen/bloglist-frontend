@@ -21,7 +21,7 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
     borderWidth: 1.5,
     marginBottom: 5
   }
-  const blogNameStyle = {
+  const blogTitleStyle = {
     fontWeight: 550,
     display: 'inline',
     cursor: 'pointer'
@@ -62,12 +62,12 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
 
   return (
     <div className='blog' style={blogStyle}>
-      <div style={blogNameStyle} onClick={toggleVisibility}>{blog.title}</div> by <div style={blogAuthorStyle}>{blog.author}</div> <button onClick={toggleVisibility}>{buttonLabel}</button>
+      <div id='blog-title' style={blogTitleStyle} onClick={toggleVisibility}>{blog.title}</div> by <div style={blogAuthorStyle}>{blog.author}</div> <button onClick={toggleVisibility}>{buttonLabel}</button>
       <div style={showWhenVisible} className='togglableContent'>
-        <div>{blog.url}</div>
-        <div>{blog.likes} <button onClick={handleLikeClick}>like</button></div>
-        <div>{blog.user ? blog.user.name : 'Unknown user'}</div>
-        <button style={deleteBlogButtonStyle} onClick={handleDeleteClick}>delete blog</button>
+        <div id='blog-url'>{blog.url}</div>
+        <div id='blog-likes'>{blog.likes} <button id='like-button' onClick={handleLikeClick}>like</button></div>
+        <div id='blog-user'>{blog.user ? blog.user.name : 'Unknown user'}</div>
+        <button id='delete-blog-button' style={deleteBlogButtonStyle} onClick={handleDeleteClick}>delete blog</button>
       </div>
     </div>
   )

@@ -60,8 +60,23 @@ describe('Blog app', function () {
 
       cy.contains(`${blog.title} by ${blog.author}`)
       cy.contains('view').click()
-      cy.contains(blog.url)
-      cy.contains('0')
+      cy.get('#blog-url').contains(blog.url)
+      cy.get('#blog-likes').contains('0')
+      cy.get('#blog-user').contains(user.name)
+    })
+
+    it('A blog can be liked', function () {
+      cy.contains('add blog').click()
+
+      cy.get('#title').type(blog.title)
+      cy.get('#author').type(blog.author)
+      cy.get('#url').type(blog.url)
+      cy.get('#create-blog-button').click()
+
+      cy.contains('view').click()
+      cy.get('#blog-likes').contains('0')
+      cy.get('#like-button').click()
+      cy.get('#blog-likes').contains('1')
     })
   })
 })
