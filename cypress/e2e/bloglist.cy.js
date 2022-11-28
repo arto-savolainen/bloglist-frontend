@@ -35,7 +35,7 @@ describe('Blog app', function () {
   })
 
   describe('When logged in', function () {
-    const blog = {
+    let blog = {
       title: 'test blog',
       author: 'test author',
       url: 'test url'
@@ -112,6 +112,70 @@ describe('Blog app', function () {
       })
       cy.contains('Error: not authorized')
       cy.contains(`${blog.title} by ${blog.author}`)
+    })
+
+    it('Blogs are arranged in descending order of likes', function () {
+      const blogs = [
+        {
+          title: 'blog 0',
+          author: 'author 0',
+          url: 'url 0'
+        },
+        {
+          title: 'blog 1',
+          author: 'author 1',
+          url: 'url 1'
+        },
+        {
+          title: 'blog 2',
+          author: 'author 2',
+          url: 'url 2'
+        }
+      ]
+
+      blogs.forEach(function (x) {
+        blog = x
+        addBlog()
+      })
+     
+      //Check that in the beginning, blogs are in the order they were added
+      cy.get('.blog').eq(0).should('contain', blogs[0].title)
+      cy.get('.blog').eq(1).should('contain', blogs[1].title)
+      cy.get('.blog').eq(2).should('contain', blogs[2].title)
+
+      //Assign alias to PUT requests so we can wait for likes to update after clicking the button
+      cy.intercept({
+        method: 'PUT'
+      })
+      .as('likePutRequest')
+
+      //Increase likes of last blog by 6
+      for (let i = 1; i <= 6; i++) {
+        cy.get('.blog').eq(2).contains('like').click()
+        cy.wait('@likePutRequest').its('response.statusCode').should('equal', 200)
+      }
+
+      //Refresh page to sort blogs according to likes
+      cy.reload()
+
+      //Now order should be: blog 2, blog 0, blog 1
+      cy.get('.blog').eq(0).should('contain', blogs[2].title)
+      cy.get('.blog').eq(1).should('contain', blogs[0].title)
+      cy.get('.blog').eq(2).should('contain', blogs[1].title)
+  
+      //Increase likes of last blog (now 'blog 1') by 3
+      cy.get('.blog').eq(2).contains('view').click()
+      for (let i = 1; i <= 3; i++) {
+        cy.get('.blog').eq(2).contains('like').click()
+        cy.wait('@likePutRequest').its('response.statusCode').should('equal', 200)
+      }
+
+      cy.reload()
+
+      //Now order should be: blog 2, blog 1, blog 0
+      cy.get('.blog').eq(0).should('contain', blogs[2].title)
+      cy.get('.blog').eq(1).should('contain', blogs[1].title)
+      cy.get('.blog').eq(2).should('contain', blogs[0].title)
     })
   })
 })
