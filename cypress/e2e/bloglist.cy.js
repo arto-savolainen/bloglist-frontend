@@ -137,7 +137,7 @@ describe('Blog app', function () {
         blog = x
         addBlog()
       })
-     
+
       //Check that in the beginning, blogs are in the order they were added
       cy.get('.blog').eq(0).should('contain', blogs[0].title)
       cy.get('.blog').eq(1).should('contain', blogs[1].title)
@@ -147,7 +147,7 @@ describe('Blog app', function () {
       cy.intercept({
         method: 'PUT'
       })
-      .as('likePutRequest')
+        .as('likePutRequest')
 
       //Increase likes of last blog by 6
       for (let i = 1; i <= 6; i++) {
@@ -162,7 +162,7 @@ describe('Blog app', function () {
       cy.get('.blog').eq(0).should('contain', blogs[2].title)
       cy.get('.blog').eq(1).should('contain', blogs[0].title)
       cy.get('.blog').eq(2).should('contain', blogs[1].title)
-  
+
       //Increase likes of last blog (now 'blog 1') by 3
       cy.get('.blog').eq(2).contains('view').click()
       for (let i = 1; i <= 3; i++) {
